@@ -71,3 +71,11 @@ The project folder only had a README. The real starting point is a set of HTML p
 **About filters:** the demo catalog (mock.shop) returns no filters for any collection or search, so the filter column shows only sorting today. The filter code is generic: it draws whatever filters Shopify sends, so filters appear on their own once a real store has them. We don't make up filters.
 
 **Checked:** in headless Chrome, choosing Moss / M changed the URL, and add to cart turned "Cart (0)" into "Cart (1)" with no console errors. Sorting by price works on a collection and in search.
+
+## 2026-11-01 — Cart page and checkout hand-off
+
+**What changed:** `/cart` lists each line with its image, options, line total, a quantity box, −/+ buttons, and Remove. Each line is its own form, following Hydrogen's cart rules, so Enter in the quantity box sets the quantity. The summary shows Shopify's subtotal and total; we don't do any price maths in the browser. While a change is in flight, the old numbers fade instead of disappearing. Errors appear next to the line they belong to, and anything else shows in a dismissable banner.
+
+**Works without JavaScript:** the layout waits for the real cart before rendering, so `/cart` shows its items on first paint. The add-to-cart and quantity forms post to Hydrogen's `/api/cart` handler, which sets the cart cookie and sends you back (303). We checked this with curl: add 2, set to 3, then +1 gave 4, and the subtotals came from Shopify each time.
+
+**Checkout:** the Checkout button uses the cart's own `checkoutUrl`. On mock.shop that is `https://apparel-athleisure.hydrogen.mock.shop/checkout`. Hydrogen's `/checkout` route redirects (302) to `…/checkout?payment=shop_pay`. That page is mock.shop's own demo checkout ("Checkout · Zenith Motion"), so no payment is taken. We built no card form and no fake "order placed" page. The optional Buy-now link was skipped to keep the scope small.
