@@ -59,3 +59,15 @@ The project folder only had a README. The real starting point is a set of HTML p
 **Category tiles:** the four prototype labels stay. A tile links to a real `/collections/{handle}` only when the API returns a collection whose title or handle matches it. Today only "Shirts & Rashguards" matches (`versatile-performance-tops`); the other three link to `/collections`, because mock.shop has no singlets, fight shorts, or footwear collections.
 
 **What we dropped from the prototype, and why:** the made-up product names and prices (Apex Pro tee and friends), the "new drop / low stock (3 left)" badges, the size pills and quick filters on product cards, the spec badges (240 GSM, 3.8x evaporation), and the NCAA/UWW compliance claims. None of that comes from the catalog, and the plan says not to invent prices, stock, or filters. The newsletter strip is gone too, since we don't store messages. The prototype's stock photos are external images that aren't ours, so tiles without a matching collection show a numbered block instead.
+
+## 2026-11-01 — Shop, search, and product pages
+
+**What changed:** `/collections` lists the store's collections plus every product, with a "Next page" link that uses `?after=`. `/collections/{handle}` and `/search?q=` share one browser built on Hydrogen's collection helpers: a plain GET form (it works without JavaScript), sort, filter checkboxes and price inputs, removable filter chips, and next-page links. Changing a filter or sort always goes back to page one. The search term only reaches Shopify as a GraphQL variable. Search sorts only by relevance or price, since that is all Shopify's search supports. An empty search makes no API call and shows a prompt instead.
+
+**Product page:** `/products/{handle}` shows the gallery (the chosen variant's image first), price, option buttons, and add to cart, all through Hydrogen's product form. Picking an option updates the URL (`?Color=Moss&Size=M`), so a variant can be shared and reloaded. Combinations that don't exist are shown greyed out. A product or collection that doesn't exist returns a real 404.
+
+**Cart wiring:** the root layout now reads the cart on the server and hands it to Hydrogen's cart provider. Shopify's small runtime script is loaded (Standard Actions, which cart forms need), with analytics and WebMCP switched off. The header shows "Cart (n)".
+
+**About filters:** the demo catalog (mock.shop) returns no filters for any collection or search, so the filter column shows only sorting today. The filter code is generic: it draws whatever filters Shopify sends, so filters appear on their own once a real store has them. We don't make up filters.
+
+**Checked:** in headless Chrome, choosing Moss / M changed the URL, and add to cart turned "Cart (0)" into "Cart (1)" with no console errors. Sorting by price works on a collection and in search.
