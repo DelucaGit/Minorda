@@ -1,0 +1,23 @@
+# Minorda journey
+
+A running log of what we build, what we decide, and why. This is source material for a later article, so each entry should say what happened and the reason behind it.
+
+## 2026-11-01 — Saved the design prototype
+
+The project folder only had a README. The real starting point is a set of HTML pages exported from a design tool. They show the look of the store. They are not a working shop: links go to `#`, and there is no shared cart or product data.
+
+**Decision:** keep those pages untouched in `design-prototype/`, with names that match the screen.
+
+| File | Screen |
+| --- | --- |
+| `home.html` | Home. Hero, categories, product drops, durability, newsletter. |
+| `shop.html` | Shop all. Filters and product grid. |
+| `product.html` | Product page for the Apex Pro Performance Tee. |
+| `checkout-shipping.html` | Checkout step 1. Contact, address, shipping method. |
+| `checkout-payment.html` | Checkout step 2. Payment and order review. |
+
+**Why this shape:** renaming the temp files (`code (1).html` and so on) makes the set readable later. Leaving the HTML as exported means we still have the original design when we build the real site. The checkout pages use fake sample customers and card numbers. Those stay inside the prototype only. A real payment form is a later decision, and card numbers should never be stored by our own code.
+
+`product.html` and `shop.html` are much larger than the other three because the export embedded images in the file. `home.html` and the checkout pages point at external image URLs instead.
+
+**Not done yet:** no shared layout, no real navigation between pages, no Shopify store. Next step is still open.
