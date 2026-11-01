@@ -21,3 +21,17 @@ The project folder only had a README. The real starting point is a set of HTML p
 `product.html` and `shop.html` are much larger than the other three because the export embedded images in the file. `home.html` and the checkout pages point at external image URLs instead.
 
 **Not done yet:** no shared layout, no real navigation between pages, no Shopify store. Next step is still open.
+
+## 2026-11-01 — Picked the stack: Next.js plus Hydrogen 2026-10
+
+**Decision:** the storefront is a Next.js app (App Router, TypeScript, Tailwind) in `storefront/`. Shopify is the backend, reached only through Hydrogen `2026-10` (`@shopify/hydrogen` 2026.10.x). Until a real Shopify store exists, the catalog comes from the public demo store `apparel-athleisure.mock.shop`.
+
+**What we are not building:** no Java, no second backend, no database of our own, no SQL. No card form either. Payment, address, and shipping method stay on Shopify Checkout, and the checkout pages in `design-prototype/` are only a look-and-feel reference.
+
+**Security rules we keep from day one:**
+
+- Private tokens stay server-only. They never get a `NEXT_PUBLIC_` prefix, and `.env` stays gitignored. mock.shop needs no token at all.
+- Shopify text renders as React text. No `dangerouslySetInnerHTML`.
+- Visitor input, like search text, goes into GraphQL variables, never into the query string.
+
+**Why:** Shopify already runs the catalog, cart, and checkout. Building our own backend would mean storing orders and payment data we don't need to hold. Hydrogen gives Next.js the cart and checkout handlers, so the site stays one app.
