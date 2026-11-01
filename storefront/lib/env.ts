@@ -9,7 +9,7 @@ export const publicStorefrontToken =
 
 export const i18n = { country: "US", language: "EN" } as const;
 
-export const LOCALE = "en-US";
+
 
 if (!storeDomain) {
   throw new Error("NEXT_PUBLIC_STORE_DOMAIN is not set. Copy .env.example to .env.");

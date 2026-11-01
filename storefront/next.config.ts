@@ -12,12 +12,6 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "cdn.shopify.com" },
-      { protocol: "https", hostname: "**.mock.shop" },
-    ],
-  },
 };
 
 export default nextConfig;
