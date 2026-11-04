@@ -21,3 +21,13 @@ The project folder only had a README. The real starting point is a set of HTML p
 `product.html` and `shop.html` are much larger than the other three because the export embedded images in the file. `home.html` and the checkout pages point at external image URLs instead.
 
 **Not done yet:** no shared layout, no real navigation between pages, no Shopify store. Next step is still open.
+
+## 2026-11-04 — Tried a clothing rail
+
+The client asked if products could hang the way clothes hang on a wardrobe rail, and if a shopper could move along them as if they were standing in the store.
+
+**Decision:** build a try-out on the home page before treating it as part of the real shop. The motion has three parts. The row slides sideways. The piece nearest the middle turns to face you. A fast slide swings every piece from its hook, then a spring lets it settle.
+
+**Why the photos hang as cards:** the demo catalog photos are studio shots with backgrounds. They are not cut out around the garment. Hanging the whole photo on a metal hanger tells us whether the *movement* feels right. Bare clothes on a rail need different photos later.
+
+**What we left out on purpose:** this is not the finished home page from the plan. Titles, prices, and images come from `apparel-athleisure.mock.shop`. A Pilates mat in that catalog is skipped because it is not a garment. No prices or names were invented. The Hydrogen client is not wired yet, so this page reads the public catalog directly and formats the price with `Intl.NumberFormat`.
