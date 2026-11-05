@@ -1,79 +1,56 @@
-// Live products for the clothing-rail try-out.
-// This is a public read of apparel-athleisure.mock.shop. There is no token.
-// The finished storefront will use the Hydrogen client. This file only exists
-// so we can see the rack with real titles, prices, and photos.
+// Public catalog read. apparel-athleisure.mock.shop does not use a token.
+// Titles, photos, and prices come from this response. We do not invent them.
 
-const STORE_DOMAIN = "apparel-athleisure.mock.shop";
-const CATALOG_URL = `https://${STORE_DOMAIN}/api/2026-10/graphql.json`;
+const CATALOG_URL =
+  "https://apparel-athleisure.mock.shop/api/2026-10/graphql.json";
 
-const RAIL_PRODUCTS_QUERY = `
-  query RailProducts {
-    products(first: 14) {
-      nodes {
-        id
-        handle
-        title
-        featuredImage {
-          url
-          altText
-          width
-          height
-        }
-        priceRange {
-          minVariantPrice {
-            amount
-            currencyCode
-          }
-        }
-      }
-    }
-  }
-`;
-
-export type HangingGarment = {
+export type CatalogProduct = {
   id: string;
   handle: string;
   title: string;
+  description: string;
   price: string;
-  imageUrl: string;
+  imageUrl: string | null;
   imageAlt: string;
-  imageWidth: number;
-  imageHeight: number;
 };
 
-type CatalogResponse = {
+type Money = { amount: string; currencyCode: string };
+
+type ProductNode = {
+  id: string;
+  handle: string;
+  title: string;
+  description?: string | null;
+  featuredImage?: {
+    url: string;
+    altText?: string | null;
+  } | null;
+  priceRange?: { minVariantPrice?: Money | null } | null;
+};
+
+type CatalogPayload = {
   data?: {
-    products?: {
-      nodes?: Array<{
-        id: string;
-        handle: string;
-        title: string;
-        featuredImage?: {
-          url: string;
-          altText?: string | null;
-          width?: number | null;
-          height?: number | null;
-        } | null;
-        priceRange?: {
-          minVariantPrice?: {
-            amount: string;
-            currencyCode: string;
-          } | null;
-        } | null;
-      }>;
-    };
+    products?: { nodes?: ProductNode[] };
+    product?: ProductNode | null;
   };
   errors?: Array<{ message?: string }>;
 };
 
+const PRODUCT_FIELDS = `
+  id
+  handle
+  title
+  description
+  featuredImage { url altText }
+  priceRange { minVariantPrice { amount currencyCode } }
+`;
+
 function formatPrice(amount: string, currencyCode: string): string {
   const value = Number(amount);
-  if (!Number.isFinite(value)) {
-    return `${amount} ${currencyCode}`;
-  }
+  if (!Number.isFinite(value)) return `${amount} ${currencyCode}`;
 
   try {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("sv-SE", {
       style: "currency",
       currency: currencyCode,
     }).format(value);
@@ -82,58 +59,89 @@ function formatPrice(amount: string, currencyCode: string): string {
   }
 }
 
-export async function loadRailGarments(): Promise<HangingGarment[]> {
+function toProduct(node: ProductNode): CatalogProduct {
+  const money = node.priceRange?.minVariantPrice;
+  return {
+    id: node.id,
+    handle: node.handle,
+    title: node.title,
+    description: node.description ?? "",
+    price: money ? formatPrice(money.amount, money.currencyCode) : "Pris saknas",
+    imageUrl: node.featuredImage?.url ?? null,
+    imageAlt: node.featuredImage?.altText || node.title,
+  };
+}
+
+async function storefront(
+  query: string,
+  variables?: Record<string, string | number>,
+): Promise<CatalogPayload> {
   let response: Response;
   try {
     response = await fetch(CATALOG_URL, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query: RAIL_PRODUCTS_QUERY }),
+      body: JSON.stringify({ query, variables }),
       next: { revalidate: 3600 },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Could not reach mock.shop: ${message}`);
+    throw new Error(`Kunde inte nå katalogen: ${message}`);
   }
 
   if (!response.ok) {
     throw new Error(
-      `mock.shop responded ${response.status} ${response.statusText}`,
+      `Katalogen svarade ${response.status} ${response.statusText}`,
     );
   }
 
-  const payload = (await response.json()) as CatalogResponse;
+  const payload = (await response.json()) as CatalogPayload;
   if (payload.errors?.length) {
     const message = payload.errors
       .map((error) => error.message)
       .filter(Boolean)
       .join("; ");
-    throw new Error(message || "mock.shop returned a GraphQL error");
+    throw new Error(message || "Katalogen returnerade ett fel");
   }
 
-  const nodes = payload.data?.products?.nodes ?? [];
+  return payload;
+}
 
-  return nodes
-    .filter((product) => {
-      if (!product.featuredImage?.url) return false;
-      // The rail is for clothes. The demo catalog also includes a Pilates mat.
-      return !/pilates mat/i.test(product.title);
-    })
-    .slice(0, 10)
-    .map((product) => {
-      const image = product.featuredImage!;
-      const price = product.priceRange?.minVariantPrice;
-      return {
-        id: product.id,
-        handle: product.handle,
-        title: product.title,
-        price: price
-          ? formatPrice(price.amount, price.currencyCode)
-          : "Price unavailable",
-        imageUrl: image.url,
-        imageAlt: image.altText || product.title,
-        imageWidth: image.width || 768,
-        imageHeight: image.height || 1344,
-      };
-    });
+export async function loadProducts(first = 8): Promise<CatalogProduct[]> {
+  const payload = await storefront(
+    `query Products($first: Int!) {
+      products(first: $first) { nodes { ${PRODUCT_FIELDS} } }
+    }`,
+    { first },
+  );
+
+  return (payload.data?.products?.nodes ?? [])
+    .filter((product) => product.featuredImage?.url)
+    .map(toProduct);
+}
+
+export async function loadProduct(
+  handle: string,
+): Promise<CatalogProduct | null> {
+  const payload = await storefront(
+    `query Product($handle: String!) {
+      product(handle: $handle) { ${PRODUCT_FIELDS} }
+    }`,
+    { handle },
+  );
+
+  const product = payload.data?.product;
+  if (!product) return null;
+  return toProduct(product);
+}
+
+export async function searchProducts(query: string): Promise<CatalogProduct[]> {
+  const payload = await storefront(
+    `query SearchProducts($query: String!) {
+      products(first: 12, query: $query) { nodes { ${PRODUCT_FIELDS} } }
+    }`,
+    { query },
+  );
+
+  return (payload.data?.products?.nodes ?? []).map(toProduct);
 }

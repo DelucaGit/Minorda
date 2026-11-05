@@ -31,3 +31,11 @@ The client asked if products could hang the way clothes hang on a wardrobe rail,
 **Why the photos hang as cards:** the demo catalog photos are studio shots with backgrounds. They are not cut out around the garment. Hanging the whole photo on a metal hanger tells us whether the *movement* feels right. Bare clothes on a rail need different photos later.
 
 **What we left out on purpose:** this is not the finished home page from the plan. Titles, prices, and images come from `apparel-athleisure.mock.shop`. A Pilates mat in that catalog is skipped because it is not a garment. No prices or names were invented. The Hydrogen client is not wired yet, so this page reads the public catalog directly and formats the price with `Intl.NumberFormat`.
+
+## 2026-11-05 — Swedish flagship replaces the rail try-out
+
+The owner sent a new Stitch export, `minorda_flagship_storefront_svenska`. That screen is now the home page. The interface is Swedish. The slogan stays in English, exactly as written: Progress isn't linear. Rise is never flat.
+
+**Why the product row still uses the catalog:** the big campaign cards (Apex, Vanguard, Kinetic) are design photos and marketing lines. They are not SKUs. “Populärt just nu” shows live titles, photos, and prices. The demo catalog is priced in USD, so the header says USD instead of pretending the prices are kronor.
+
+**What we did not copy:** the checkout screen in the zip, the sample cart with two invented lines, wishlist counts, and stock badges such as “3 left”. Payment stays on Shopify later. The clothing rail try-out is no longer the home page.

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Chivo, Space_Grotesk } from "next/font/google";
 
+import { SiteFooter } from "@/app/components/site-footer";
+import { SiteHeader } from "@/app/components/site-header";
 import "./globals.css";
 
 const chivo = Chivo({
@@ -17,17 +19,19 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Minorda",
-  description: "Minorda storefront",
+  description: "Progress isn't linear. Rise is never flat.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="sv"
       className={`${chivo.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-white font-sans text-slate-950">
+      <body className="min-h-full bg-white font-sans text-[#111111]">
+        <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
