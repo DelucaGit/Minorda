@@ -1,16 +1,10 @@
 import Link from "next/link";
 
+import { HeaderTools } from "@/app/components/header-tools";
+import { IconPerson, IconSearch } from "@/app/components/icons";
+import { usesShopifyCatalog } from "@/app/lib/catalog";
+import { shopNav } from "@/app/lib/catalog-nav";
 import { brandLogo } from "@/app/lib/home-design";
-import { IconBag, IconHeart, IconPerson, IconSearch } from "@/app/components/icons";
-
-const nav = [
-  { href: "/#senaste", label: "Nyheter" },
-  { href: "/collections", label: "Kamp och brottning" },
-  { href: "/collections", label: "Herr" },
-  { href: "/collections", label: "Träning" },
-  { href: "/collections", label: "Utrustning och tillbehör" },
-  { href: "/collections", label: "Kollektioner" },
-];
 
 export function SiteHeader() {
   return (
@@ -31,7 +25,7 @@ export function SiteHeader() {
             </span>
           </div>
           <div className="flex items-center gap-4 text-[#111111]">
-            <span>USD ($)</span>
+            <span>{usesShopifyCatalog() ? "USD ($)" : "SEK"}</span>
             <span className="text-slate-300">|</span>
             <a className="hover:text-[#707072]" href="mailto:ops@minorda.com">
               Hjälp
@@ -51,7 +45,7 @@ export function SiteHeader() {
           </Link>
 
           <nav className="hidden items-center gap-7 text-[15px] font-semibold lg:flex">
-            {nav.map((item) => (
+            {shopNav.map((item) => (
               <Link key={item.label} href={item.href} className="hover:text-[#0047ff]">
                 {item.label}
               </Link>
@@ -70,12 +64,7 @@ export function SiteHeader() {
                 />
               </label>
             </form>
-            <span className="rounded-full p-2 text-[#111111]" aria-hidden="true">
-              <IconHeart className="h-6 w-6" />
-            </span>
-            <Link href="/cart" aria-label="Varukorg" className="rounded-full p-2 hover:bg-[#f5f5f5]">
-              <IconBag className="h-6 w-6" />
-            </Link>
+            <HeaderTools />
             <span className="rounded-full p-2" aria-hidden="true">
               <IconPerson className="h-6 w-6" />
             </span>

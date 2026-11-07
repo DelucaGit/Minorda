@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, type RefObject } from "react";
 
+import { FavoriteButton } from "@/app/components/favorite-button";
 import { IconChevron } from "@/app/components/icons";
 import type { CatalogProduct } from "@/app/lib/catalog";
 import {
@@ -104,7 +105,7 @@ export function HomeStorefront({ products }: { products: CatalogProduct[] }) {
           {spotlightCards.map((card) => (
             <Link
               key={card.title}
-              href="/collections"
+              href={card.href}
               className="group relative aspect-[4/5] w-[78%] shrink-0 snap-start overflow-hidden rounded-xl bg-[#111] sm:w-[46%] lg:w-[32%]"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -139,7 +140,7 @@ export function HomeStorefront({ products }: { products: CatalogProduct[] }) {
           {categoryTiles.map((tile) => (
             <Link
               key={tile.label}
-              href="/collections"
+              href={tile.href}
               className="relative flex aspect-[3/4] items-end overflow-hidden rounded-xl bg-[#f0f0f2] p-5"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -159,20 +160,29 @@ export function HomeStorefront({ products }: { products: CatalogProduct[] }) {
 
       <section className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <h2 className="font-display text-[22px] font-bold tracking-tight uppercase sm:text-[28px]">
-            Populärt just nu
-          </h2>
+          <div>
+            <h2 className="font-display text-[22px] font-bold tracking-tight uppercase sm:text-[28px]">
+              Populärt just nu
+            </h2>
+            <Link href="/collections" className="text-sm font-semibold text-[#0047ff]">
+              Visa alla {products.length}
+            </Link>
+          </div>
           <RowButtons target={popularRef} />
         </div>
         {products.length === 0 ? (
           <p className="text-[#707072]">Katalogen skickade inga produkter.</p>
         ) : (
           <div ref={popularRef} className="flex snap-x gap-6 overflow-x-auto pb-2">
-            {products.map((product) => (
+            {products.slice(0, 12).map((product) => (
               <article
                 key={product.id}
-                className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[23%]"
+                className="relative w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[23%]"
               >
+                <FavoriteButton
+                  handle={product.handle}
+                  className="absolute top-3 right-3 z-10"
+                />
                 <Link href={`/products/${product.handle}`} className="group block">
                   <div className="relative mb-3 aspect-square overflow-hidden rounded-xl bg-[#f5f5f5]">
                     {product.imageUrl ? (

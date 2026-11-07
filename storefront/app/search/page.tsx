@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { Suspense } from "react";
 
-import { searchProducts } from "@/app/lib/catalog";
+import { ProductGrid } from "@/app/components/product-grid";
+import { searchStorefrontProducts } from "@/app/lib/catalog";
 
 export const metadata = {
   title: "Sök · Minorda",
@@ -46,7 +46,7 @@ async function SearchResults({
     );
   }
 
-  const result = await searchProducts(query).then(
+  const result = await searchStorefrontProducts(query).then(
     (products) => ({ ok: true as const, products }),
     (error: unknown) => ({
       ok: false as const,
@@ -65,28 +65,7 @@ async function SearchResults({
       ) : result.products.length === 0 ? (
         <p className="mt-8">Inga produkter matchade sökningen.</p>
       ) : (
-        <ul className="mt-8 grid grid-cols-2 gap-6 lg:grid-cols-4">
-          {result.products.map((product) => (
-            <li key={product.id}>
-              <Link href={`/products/${product.handle}`} className="group block">
-                <div className="mb-3 aspect-square overflow-hidden rounded-xl bg-[#f5f5f5]">
-                  {product.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={product.imageUrl}
-                      alt={product.imageAlt}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : null}
-                </div>
-                <h2 className="font-display font-bold group-hover:text-[#0047ff]">
-                  {product.title}
-                </h2>
-                <p className="font-display font-bold">{product.price}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <ProductGrid products={result.products} />
       )}
     </main>
   );

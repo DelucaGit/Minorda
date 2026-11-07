@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { HomeStorefront } from "@/app/components/home-storefront";
-import { loadProducts } from "@/app/lib/catalog";
+import { loadHomeProducts } from "@/app/lib/catalog";
 
 export const metadata = {
   title: "Minorda",
@@ -19,7 +19,7 @@ export default function HomePage() {
 }
 
 async function HomeProducts() {
-  const result = await loadProducts(8).then(
+  const result = await loadHomeProducts().then(
     (products) => ({ ok: true as const, products }),
     (error: unknown) => ({
       ok: false as const,

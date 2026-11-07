@@ -27,10 +27,15 @@ export function IconPerson({ className }: IconProps) {
   );
 }
 
-export function IconHeart({ className }: IconProps) {
+export function IconHeart({ className, filled = false }: IconProps & { filled?: boolean }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 19s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 19s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9z"
+        fill={filled ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
     </svg>
   );
 }

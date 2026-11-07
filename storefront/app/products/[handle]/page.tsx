@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { loadProduct } from "@/app/lib/catalog";
+import { ProductActions } from "@/app/components/product-actions";
+import { loadStorefrontProduct, usesShopifyCatalog } from "@/app/lib/catalog";
 
 export default function ProductPage({
   params,
@@ -23,7 +24,7 @@ async function ProductDetails({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const result = await loadProduct(handle).then(
+  const result = await loadStorefrontProduct(handle).then(
     (product) => ({ ok: true as const, product }),
     (error: unknown) => ({
       ok: false as const,
@@ -70,9 +71,18 @@ async function ProductDetails({
         ) : null}
       </div>
       <div>
-        <p className="font-display text-[12px] font-bold tracking-widest text-[#0047ff] uppercase">
-          Minorda
-        </p>
+        {product.collectionHandle ? (
+          <Link
+            href={`/collections/${product.collectionHandle}`}
+            className="font-display text-[12px] font-bold tracking-widest text-[#0047ff] uppercase"
+          >
+            {product.collectionTitle}
+          </Link>
+        ) : (
+          <p className="font-display text-[12px] font-bold tracking-widest text-[#0047ff] uppercase">
+            Minorda
+          </p>
+        )}
         <h1 className="font-display mt-2 text-4xl font-bold uppercase">
           {product.title}
         </h1>
@@ -84,9 +94,13 @@ async function ProductDetails({
             {product.description}
           </p>
         ) : null}
-        <p className="mt-8 text-sm text-[#707072]">
-          Storlek och lägg i varukorg kopplas på när kassan är inkopplad.
-        </p>
+        {usesShopifyCatalog() ? (
+          <p className="mt-8 text-sm text-[#707072]">
+            Storlek och lägg i varukorg kopplas till Shopify när butiken är i produktion.
+          </p>
+        ) : (
+          <ProductActions handle={product.handle} sizes={product.sizes ?? ["M"]} />
+        )}
       </div>
     </main>
   );

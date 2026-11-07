@@ -1,41 +1,24 @@
 import Link from "next/link";
 
+import { usesShopifyCatalog } from "@/app/lib/catalog";
+import { footerColumns } from "@/app/lib/catalog-nav";
 import { brandLogo } from "@/app/lib/home-design";
-
-const columns = [
-  {
-    title: "Skor och tävling",
-    links: ["Brottarskor", "Mattskor", "Tävlingstrikåer", "Greppstrumpor"],
-  },
-  {
-    title: "Kläder",
-    links: ["Rashguards", "Brottarshorts", "Träningströjor", "Trikåset"],
-  },
-  {
-    title: "Tillbehör",
-    links: ["Väskor", "Knäskydd", "Handdukar", "Ledstöd"],
-  },
-  {
-    title: "Kollektioner",
-    links: ["Apex Combat Drop 04", "Vanguard Series", "Svart kapsel", "Electric Volt"],
-  },
-];
 
 export function SiteFooter() {
   return (
     <footer>
       <section className="border-t border-[#e5e5e5] bg-white py-12">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-8 px-6 md:grid-cols-4">
-          {columns.map((column) => (
+          {footerColumns.map((column) => (
             <div key={column.title}>
               <h2 className="font-display mb-4 text-[14px] font-bold uppercase">
                 {column.title}
               </h2>
               <ul className="space-y-2.5 text-[13px] text-[#707072]">
-                {column.links.map((label) => (
-                  <li key={label}>
-                    <Link href="/collections" className="hover:text-[#111111]">
-                      {label}
+                {column.links.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="hover:text-[#111111]">
+                      {link.label}
                     </Link>
                   </li>
                 ))}
@@ -98,7 +81,11 @@ export function SiteFooter() {
         </div>
         <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-6 pt-8 text-[12px] text-[#8d8d8d] md:flex-row md:items-center md:justify-between">
           <p>© 2026 Minorda. Alla rättigheter förbehållna.</p>
-          <p>Priserna kommer från demokatalogen och visas i katalogens valuta.</p>
+          <p>
+            {usesShopifyCatalog()
+              ? "Produktlistan hämtas från Shopify."
+              : "Hemsidan visar en tillfällig lista. I produktion hämtas produkterna från Shopify."}
+          </p>
         </div>
       </div>
     </footer>

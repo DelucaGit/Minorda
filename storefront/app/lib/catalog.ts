@@ -12,6 +12,12 @@ export type CatalogProduct = {
   price: string;
   imageUrl: string | null;
   imageAlt: string;
+  categoryHandle?: string;
+  categoryTitle?: string;
+  collectionHandle?: string;
+  collectionTitle?: string;
+  priceAmount?: number;
+  sizes?: string[];
 };
 
 type Money = { amount: string; currencyCode: string };
@@ -107,6 +113,37 @@ async function storefront(
   return payload;
 }
 
+// Shop pages use the mock wrestling list while we develop.
+// A production build reads the live Shopify catalog instead.
+export function usesShopifyCatalog(): boolean {
+  return process.env.NODE_ENV === "production";
+}
+
+async function loadMockProducts(): Promise<CatalogProduct[]> {
+  const { mockWrestlingProducts } = await import("@/app/lib/mock-products");
+  return mockWrestlingProducts;
+}
+
+export async function loadCatalogProducts(): Promise<CatalogProduct[]> {
+  if (usesShopifyCatalog()) return loadProducts(20);
+  return loadMockProducts();
+}
+
+export async function loadHomeProducts(): Promise<CatalogProduct[]> {
+  return loadCatalogProducts();
+}
+
+export async function loadStorefrontProduct(
+  handle: string,
+): Promise<CatalogProduct | null> {
+  if (!usesShopifyCatalog()) {
+    const products = await loadMockProducts();
+    return products.find((product) => product.handle === handle) ?? null;
+  }
+
+  return loadProduct(handle);
+}
+
 export async function loadProducts(first = 8): Promise<CatalogProduct[]> {
   const payload = await storefront(
     `query Products($first: Int!) {
@@ -133,6 +170,29 @@ export async function loadProduct(
   const product = payload.data?.product;
   if (!product) return null;
   return toProduct(product);
+}
+
+export async function searchStorefrontProducts(
+  query: string,
+): Promise<CatalogProduct[]> {
+  if (usesShopifyCatalog()) return searchProducts(query);
+
+  const needle = query.trim().toLowerCase();
+  const products = await loadMockProducts();
+  if (!needle) return products;
+
+  return products.filter((product) => {
+    const haystack = [
+      product.title,
+      product.description,
+      product.categoryTitle,
+      product.collectionTitle,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(needle);
+  });
 }
 
 export async function searchProducts(query: string): Promise<CatalogProduct[]> {

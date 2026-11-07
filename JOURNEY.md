@@ -39,3 +39,23 @@ The owner sent a new Stitch export, `minorda_flagship_storefront_svenska`. That 
 **Why the product row still uses the catalog:** the big campaign cards (Apex, Vanguard, Kinetic) are design photos and marketing lines. They are not SKUs. “Populärt just nu” shows live titles, photos, and prices. The demo catalog is priced in USD, so the header says USD instead of pretending the prices are kronor.
 
 **What we did not copy:** the checkout screen in the zip, the sample cart with two invented lines, wishlist counts, and stock badges such as “3 left”. Payment stays on Shopify later. The clothing rail try-out is no longer the home page.
+
+## 2026-11-05 — Mock list of 20 wrestling products on the home page
+
+The demo catalog is women's athleisure. Those photos were showing in "Populärt just nu".
+
+**Decision:** the home page reads `storefront/app/lib/mock-products.ts` while the app is not a production build. That file is a list of 20 wrestling products: tees, rashguards, singlets, fight shorts, and wrestling shoes. Prices are placeholder kronor. Photos are the design pictures we already had, so several names share one photo.
+
+**Why a switch instead of deleting Shopify:** `loadHomeProducts` in `catalog.ts` calls Shopify when `NODE_ENV` is `production`. The same product page lookup uses the mock list in development, so a card on the home page opens a matching product. Shop and search still read the demo catalog.
+
+**What this is not:** these are not real SKUs, and add-to-cart still does not place an order.
+
+The shop page and search still read the demo catalog at first. The menu links land on that shop page, so the women's clothes stayed visible there. Both now use `loadCatalogProducts` and `searchStorefrontProducts`, which read the same mock list outside production and Shopify in a production build. Search matches the mock title and description.
+
+## 2026-11-05 — 100 mock products, local cart, local favorites
+
+The owner wanted the whole shop filled, with working menus, add to cart, and favorites, and asked if that fights the Shopify plan.
+
+**Decision:** the preview catalog is 100 wrestling products across 12 categories and 4 drops. Menu and footer links open `/collections/[handle]` and filter that list. Cart and favorites live in `localStorage` under `PreviewShopProvider`.
+
+**Why this does not replace Shopify:** a mock product has no Shopify variant id. Sending it to Shopify's cart would fail or add the wrong item. `usesShopifyCatalog()` still switches the product list to Shopify in a production build, and the cart and favorite pages then do not use the browser list. Payment stays on Shopify later.

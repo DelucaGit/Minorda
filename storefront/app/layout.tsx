@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Chivo, Space_Grotesk } from "next/font/google";
 
+import { PreviewShopProvider } from "@/app/components/preview-shop";
 import { SiteFooter } from "@/app/components/site-footer";
 import { SiteHeader } from "@/app/components/site-header";
 import "./globals.css";
@@ -29,9 +30,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${chivo.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-white font-sans text-[#111111]">
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <PreviewShopProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </PreviewShopProvider>
       </body>
     </html>
   );
